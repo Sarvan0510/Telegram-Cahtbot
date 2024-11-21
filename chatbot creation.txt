@@ -1,0 +1,117 @@
+first create agent(chat bot) using dialogflow
+dialogflow used to be api.ai after google acquired it the name is changed to dialogflow
+it is a nlu(natural language understanding) platform
+we can use this platform to build chat bot 
+no need to train the chatbot from scratch
+
+
+for amazon it is aws lex
+for fakebook wit.ai  etc....
+
+
+intents are mappings between a user's queries and actions fulfilled by ur software
+for every new chatbot 2 new intents are given by default
+default fallback intent ---- triggered when chatbot doesn't know how to respond 
+default welcome intent ---- when we greet
+
+
+we create a new intent using create-intent
+name it as help and save it
+here context means(it is used to remember parameter values so they can be passed between intents)
+then training phrases: phrases u can expect from users that can trigger the intent
+
+
+in training phrases field we add the queries that user may ask the chatbot like help me or answer me and the nlu model will train the chatbot using these phrases
+
+
+then add response phrases in response field 
+
+
+you can give ur chatbot a personality using small-talk field on the left side under the intent
+the reason for the personality is to make the experience for the user interesting
+
+
+
+now we again create a new intent to use currency converter
+after giving a training phrase, it will automatically extract the entities from the phrase coz dialogflow became advanced after many users started using it
+
+now enter training phrases to convert currencies
+after that go to action and parameters field and tick on required field of unit-currency and currency-name 
+unit-currency and currency-name are identified by the model itself
+unit-currency is the currency we give
+currency-name is the currency to which we want to convert
+
+
+we are using python flask package for currency conversion
+we can even use node.js or java or php tooo
+
+on the right side when we test the bot with queries, it gives response if there is one or else gives default prompt and under there in diagnostic info which is a json file there is a field known as parameter which contains the unit-currency ,currency-name and amount
+
+
+we need to bring this to the application we created using flask to convert the currency and sends response to the chatbot
+and this application acts as the package to the chatbot
+
+
+BUT there is a problem here 
+   The chatbot runs on google server(online)
+   the code is on the machine(offline)
+then how will the communication takes place.....
+
+To solve this we use ngrok...
+It is a tunneling software which is used to bring a machine port to online(provides a real-time web ui where u can introspect all HTTP traffic running over ur tunnels
+ngrok is used during deployment
+for production we use aws or Haruko etc...
+
+
+
+download ngrok and use the command ngrok http *port number* (port-number is the port number u get when u run the flask program on the browser)
+
+
+open the command prompt and write "ngrok config add-authtoken $YOUR_AUTHTOKEN" (authtoken is the token u get after logging in the ngrok website using authenticator code we get from authenticator app
+after logging in it gives personal authtoken use this in command prompt 
+
+after that use the "ngrok http *port number*"
+
+
+now we can use the code online for the given time
+and after clicking the link in forwarding feild(https link) the output of the same code we did will come on the browser online
+
+
+now in dialogflow click "fulfillment" field which helps in connecting to the flask program and enable webhook in it(webhook is used to get post request to the web server from dialogflow)
+
+there it asks url which is the link we got for the code using ngrok(online session link)
+save it 
+
+now go to intents field and go to currency-convertor intent we created and in the bottom of it there is 'fulfillment'
+in that enable webhook call for this intent and save the intent
+
+
+after doing this the dialogflow chatbot and flask app are connected
+
+
+
+now we use free currency convertor api to convert the currency
+we login to that then click get api key 
+we will get the api key to our mail
+
+from the documentation section copy the url for free server
+then copy url from ultra compact multiple queries and paste it after the previous url 
+in this url change api key to the one you got in the message
+and also change the query in teh url to two currencies
+
+
+now in our code create a new function to convert the currency
+in that function paste the url u got and change the query to {}_{} to take all the currencies we trained as input by formatting it
+
+
+we return the response we get as a json file to the chatbot
+
+
+
+now in telegram we create a bot using botfather 
+after creating the bot it will give token
+now in dialogflow select interaction and select telegram in it 
+it will ask for the access token 
+put the token here
+
+now we can use our chatbot in telegram till the time limit in the ngrok completes or we can stop it before in dialogflow itself
